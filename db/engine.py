@@ -1,17 +1,15 @@
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import declarative_base, sessionmaker
+from contextlib import asynccontextmanager
 
-# sqlite_file_name = "database.db"
-# sqlite_url = f"sqlite:///{sqlite_file_name}"
-
-# connect_args = {"check_same_thread": False}
-# engine = create_engine(sqlite_url, connect_args=connect_args)
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
+                                    create_async_engine)
+from sqlalchemy.orm import declarative_base
 
 server = "localhost"
 database = "BlogDB"
 driver = "ODBC Driver 17 for SQL Server"
-sqlserver_url = (
-    f"mssql+pyodbc://@{server}/{database}"
+sqlserver_async_url = (
+    f"mssql+aioodbc://@{server}/{database}"
     f"?driver={driver.replace(' ', '+')}&trusted_connection=yes"
 )
 
@@ -20,29 +18,31 @@ sqlserver_url = (
 # driver.replace(' ', '+')}&trusted_connection=yes")
 
 
-engine = create_engine(sqlserver_url)
+engine = create_async_engine(sqlserver_async_url, echo=True)
 
 
-# with engine.connect() as conn:
-# result = conn.execute(text("SELECT SYSTEM_USER, GETDATE();"))
-# for row in result:
-# print("Connected as:", row[0], "| Time:", row[1])
+async def check_connection():
+    async with engine.connect() as conn:
+        result = await conn.execute(text("SELECT SYSTEM_USER, GETDATE();"))
+        rows = result.fetchall()
+        for row in rows:
+            print("User:", row[0], "| Current SQL Server time:", row[1])
 
 
-SessionLocal = sessionmaker(
+AsyncSessionLocal = async_sessionmaker(
     bind=engine,
+    expire_on_commit=False,
+    class_=AsyncSession,
+    autoflush=False,
     autocommit=False,
-    autoflush=False
 )
 
 Base = declarative_base()
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+@asynccontextmanager
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session
 
 

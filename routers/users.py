@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 router = APIRouter()
 
@@ -22,3 +22,8 @@ async def update_user_profile():
     ...
 
 
+# @router.get("/items")
+# async def read_items(db: AsyncSessionLocal = Depends(get_db)):
+   # result = await db.execute(text("SELECT * FROM my_table"))
+   # rows = result.fetchall()
+   # return rows
