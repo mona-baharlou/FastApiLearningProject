@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
                                     create_async_engine)
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
 
 server = "localhost"
 database = "BlogDB"
@@ -40,7 +40,11 @@ AsyncSessionLocal = async_sessionmaker(
     autocommit=False,
 )
 
-Base = declarative_base()
+
+class Base(DeclarativeBase, MappedAsDataclass):
+    pass
+
+# Base = declarative_base()
 
 
 @asynccontextmanager
