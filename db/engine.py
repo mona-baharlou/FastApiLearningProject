@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 from sqlalchemy import text
@@ -26,8 +27,10 @@ async def check_connection():
         result = await conn.execute(text("SELECT SYSTEM_USER, GETDATE();"))
         rows = result.fetchall()
         for row in rows:
-            print("User:", row[0], "| Current SQL Server time:", row[1])
-
+            print(
+                "Connected as User:", row[0], "| Current SQL Server time:",
+                row[1]
+                )
 
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,
