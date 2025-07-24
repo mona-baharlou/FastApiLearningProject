@@ -16,7 +16,8 @@ sqlserver_url = (
 )
 
 
-# sqlserver_url = (f"mssql+pyodbc://@{server}/{database}?driver={driver.replace(' ', '+')}&trusted_connection=yes")
+# sqlserver_url = (f"mssql+pyodbc://@{server}/{database}?driver={
+# driver.replace(' ', '+')}&trusted_connection=yes")
 
 
 engine = create_engine(sqlserver_url)
