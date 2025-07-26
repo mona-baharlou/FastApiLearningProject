@@ -10,19 +10,6 @@ from schema._input import RegisterInput
 router = APIRouter()
 
 
-@router.post("/test")
-async def test_create(db: AsyncSession = Depends(get_db)):
-    from uuid import uuid4
-
-    from db.models import User
-
-    user = User(username="testuser", password="testpass", id=uuid4())
-    db.add(user)
-    await db.commit()
-    await db.refresh(user)
-    return {"id": str(user.id)}
-
-
 @router.post("/register")
 async def register(
     db: AsyncSession = Depends(get_db),
