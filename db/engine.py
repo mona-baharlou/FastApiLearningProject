@@ -9,7 +9,7 @@ from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
 server = "localhost"
 database = "BlogDB"
 driver = "ODBC Driver 17 for SQL Server"
-sqlserver_async_url = (
+database_url = (
     f"mssql+aioodbc://@{server}/{database}"
     f"?driver={driver.replace(' ', '+')}&trusted_connection=yes"
 )
@@ -19,7 +19,7 @@ sqlserver_async_url = (
 # driver.replace(' ', '+')}&trusted_connection=yes")
 
 
-engine = create_async_engine(sqlserver_async_url, echo=True)
+engine = create_async_engine(database_url, echo=True)
 
 
 async def check_connection():
@@ -32,6 +32,7 @@ async def check_connection():
                 row[1]
                 )
 
+
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,
     expire_on_commit=False,
@@ -41,7 +42,7 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 
-class Base(DeclarativeBase, MappedAsDataclass):
+class Base(DeclarativeBase):
     pass
 
 # Base = declarative_base()
