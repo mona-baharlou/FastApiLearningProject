@@ -1,3 +1,4 @@
+import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.models import User
@@ -18,3 +19,15 @@ class UserOperation:
             print("Error during user creation:", e)
             await self.db_session.rollback()
             raise
+
+    async def get_user_by_username(self, username: str) -> User:
+        query = sa.select(User).where(User.username == username)
+
+        async with self.db_session as session:
+            data = await session.scalar(query)
+
+            if data is None:
+                raise  # ValidationErr("User not found! ")
+            return data
+
+

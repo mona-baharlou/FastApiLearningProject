@@ -26,9 +26,16 @@ async def login():
     ...
 
 
-@router.get("/")
-async def get_user_profile():
-    ...
+@router.get("/{username}/")
+async def get_user_profile(
+  username: str,
+  db: AsyncSession = Depends(get_db),
+):
+    op = UserOperation(db)
+    user_profile = await op.get_user_by_username(username=username)
+    return user_profile
+
+
 
 
 @router.put("/update")
