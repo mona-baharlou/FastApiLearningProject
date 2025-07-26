@@ -18,3 +18,4 @@ class UserOperation:
             print("❌ Error during user creation:", e)
             await self.db_session.rollback()
             raise
+        

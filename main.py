@@ -1,9 +1,4 @@
-from sys import prefix
-from typing import Annotated
-
-import uvicorn
-from fastapi import Body, Depends, FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI
 
 from db import Base, engine
 from routers.users import router as user_router
@@ -18,6 +13,3 @@ async def init_tables():
 
 
 app.include_router(user_router, prefix="/users")
-
-# if __name__ == "__main__":
-# uvicorn.run(app)

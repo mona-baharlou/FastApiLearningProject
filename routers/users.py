@@ -44,7 +44,7 @@ async def get_user_profile():
     ...
 
 
-@router.put("/register")
+@router.put("/update")
 async def update_user_profile():
     ...
 
