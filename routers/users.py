@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.engine import get_db
 from operations.users import UserOperation
-from schema._input import RegisterInput
+from schema._input import RegisterInput, UpdateProfileInput
 
 router = APIRouter()
 
@@ -35,12 +35,15 @@ async def get_user_profile(
     user_profile = await op.get_user_by_username(username=username)
     return user_profile
 
-
-
-
 @router.put("/update")
-async def update_user_profile():
-    ...
+async def update_user_profile(
+    db: AsyncSession = Depends(get_db),
+    user: UpdateProfileInput = Body()
+):
+    op = UserOperation(db)
+    update_user = await op.update_username(old_username=user.old_username,
+                                           new_username=user.new_username)
+    return {"id": update_user.id, "username": update_user.username}
 
 
 # @router.get("/items")

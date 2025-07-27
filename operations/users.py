@@ -31,3 +31,26 @@ class UserOperation:
             return data
 
 
+    async def update_username(self, old_username: str, new_username: str) -> User:
+        query = sa.select(User).where(User.username == old_username)
+        update_query = (
+            sa.update(User)
+            .where(User.username == old_username)
+            .values(username=new_username)
+        )
+
+        async with self.db_session as session:
+            data = await session.scalar(query)
+
+            if data is None:
+                raise  # ValidationErr("User not found! ")
+
+            await session.execute(update_query)
+            await session.commit()
+
+            data.username = new_username
+
+            return data
+
+
+
