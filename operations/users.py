@@ -3,6 +3,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.models import User
+from exceptions import UserNotFound
 
 
 class UserOperation:
@@ -30,10 +31,7 @@ class UserOperation:
             data = await session.scalar(query)
 
             if data is None:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="User not found !"
-                    )
+                raise UserNotFound
             return data
 
     async def update_username(self, old_username: str, new_username: str) -> User:
@@ -48,10 +46,7 @@ class UserOperation:
             data = await session.scalar(query)
 
             if data is None:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="User not found !"
-                    )
+                raise UserNotFound
 
             await session.execute(update_query)
             await session.commit()
