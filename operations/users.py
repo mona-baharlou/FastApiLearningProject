@@ -52,5 +52,20 @@ class UserOperation:
 
             return data
 
+    async def user_delete_account(self, username: str, password: str) -> None:
+
+        delete_query = sa.delete(User).where(
+            User.username == username, password == password
+                                    )
+
+        async with self.db_session as session:
+            await session.execute(delete_query)
+            await session.commit()
+
+
+
+
+
+
 
 
