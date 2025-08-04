@@ -1,9 +1,12 @@
 import sqlalchemy as sa
 from fastapi import HTTPException, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.models import User
-from exceptions import UserNotFound
+from exceptions import UserExist, UserNotFound
+from schema.output import RegisterOutput
+from utils.secrets import password_manager
 
 
 class UserOperation:
@@ -11,18 +14,22 @@ class UserOperation:
     def __init__(self, db_session: AsyncSession) -> None:
         self.db_session = db_session
 
-    async def create(self, username: str, password: str) -> User:
+    async def create(self, username: str, password: str) -> RegisterOutput:
         try:
-            user = User(username=username, password=password)
+            user_password = password_manager.hash(password)
+            user = User(username=username, password=user_password)
             self.db_session.add(user)
             await self.db_session.commit()
-            return user
-        except Exception as e:
+            return RegisterOutput(username=user.username, id=user.id)
+        except IntegrityError:
             await self.db_session.rollback()
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Error during user creation: {str(e)}"
-            )
+            raise UserExist
+        # except Exception as e:
+            # await self.db_session.rollback()
+            # raise HTTPException(
+            #    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            #    detail=f"Error during user creation: {str(e)}"
+            # )
 
     async def get_user_by_username(self, username: str) -> User:
         query = sa.select(User).where(User.username == username)

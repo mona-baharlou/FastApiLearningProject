@@ -8,4 +8,8 @@ class UserNotFound(HTTPException):
     pass
 
 
-
+class UserExist(HTTPException):
+    def __init__(self) -> None:
+        self.status_code = 400
+        self.detail = "Username exists!"
+    pass
