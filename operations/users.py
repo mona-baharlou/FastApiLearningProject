@@ -3,8 +3,8 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+import exceptions
 from db.models import User
-from exceptions import UserExist, UserNotFound
 from schema.output import RegisterOutput
 from utils.secrets import password_manager
 
@@ -23,7 +23,7 @@ class UserOperation:
             return RegisterOutput(username=user.username, id=user.id)
         except IntegrityError:
             await self.db_session.rollback()
-            raise UserExist
+            raise exceptions.UserExist
         # except Exception as e:
             # await self.db_session.rollback()
             # raise HTTPException(
@@ -38,7 +38,7 @@ class UserOperation:
             data = await session.scalar(query)
 
             if data is None:
-                raise UserNotFound
+                raise exceptions.UserNotFound
             return data
 
     async def update_username(self, old_username: str, new_username: str) -> User:
@@ -53,7 +53,7 @@ class UserOperation:
             data = await session.scalar(query)
 
             if data is None:
-                raise UserNotFound
+                raise exceptions.UserNotFound
 
             await session.execute(update_query)
             await session.commit()
@@ -61,6 +61,21 @@ class UserOperation:
             data.username = new_username
 
             return data
+
+    async def login(self, username: str, password: str) -> str:
+        query = sa.select(User).where(User.username == username)
+
+        async with self.db_session as session:
+            user = await session.scalar(query)
+            if user is None:
+                exceptions.InvalidUsernameOrPassword
+
+        if not password_manager.verify(password, user.password):
+            exceptions.InvalidUsernameOrPassword
+
+        return "YES"
+
+
 
     async def user_delete_account(self, username: str, password: str) -> None:
 

@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.engine import get_db
 from operations.users import UserOperation
-from schema._input import DeleteAccountInput, RegisterInput, UpdateProfileInput
+from schema._input import DeleteAccountInput, UpdateProfileInput, UserInput
 
 router = APIRouter()
 
@@ -13,7 +13,7 @@ router = APIRouter()
 @router.post("/register")
 async def register(
     db: AsyncSession = Depends(get_db),
-    user: RegisterInput = Body()
+    user: UserInput = Body()
    ):
     op = UserOperation(db)
     created_user = await op.create(username=user.username,
@@ -22,8 +22,13 @@ async def register(
 
 
 @router.post("/login")
-async def login():
-    ...
+async def login(
+     db: AsyncSession = Depends(get_db),
+     user: UserInput = Body()
+):
+    op = UserOperation(db)
+    token = await op.login(username=user.username, password= user.password)
+    return token
 
 
 @router.get("/{username}/")

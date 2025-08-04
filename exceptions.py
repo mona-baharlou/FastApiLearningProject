@@ -13,3 +13,10 @@ class UserExist(HTTPException):
         self.status_code = 400
         self.detail = "Username exists!"
     pass
+
+
+class InvalidUsernameOrPassword(HTTPException):
+    def __init__(self) -> None:
+        self.status_code = 400
+        self.detail = "Username or password is incorrect!"
+    pass
